@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form I-9 &amp; E-Verify in Workday — People Services Training</title>
+<style>
+  :root{
+    --navy:#10314f; --navy-2:#1a4773; --blue:#2f6db0; --blue-soft:#eaf2fb;
+    --green:#1f7a4d; --green-soft:#e6f4ec; --amber:#9a6700; --amber-soft:#fef6e0;
+    --red:#a11a1a; --red-soft:#fbe9e9; --purple:#5a3b9c; --purple-soft:#efe9fb;
+    --ink:#1c2733; --muted:#5b6b7b; --line:#e2e8ef; --bg:#f4f6f9; --card:#ffffff;
+    --radius:12px; --shadow:0 1px 3px rgba(16,49,79,.08),0 6px 24px rgba(16,49,79,.06);
+    --maxw:920px;
+  }
+  body.dark{
+    --ink:#e8eef4; --muted:#a3b1c0; --line:#27384a; --bg:#0e1620; --card:#16202c;
+    --blue-soft:#15273c; --green-soft:#12241a; --amber-soft:#2a230f; --red-soft:#2c1414; --purple-soft:#1f1733;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 6px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--blue); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* progress + topbar */
+  #progress{position:fixed;top:0;left:0;height:4px;width:100%;background:transparent;z-index:60}
+  #progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .1s}
+  .topbar{
+    position:sticky;top:0;z-index:50;background:var(--navy);color:#fff;
+    display:flex;align-items:center;gap:14px;padding:10px 18px;box-shadow:0 2px 10px rgba(0,0,0,.15)
+  }
+  .topbar .brand{font-weight:700;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+  .topbar .brand .dot{width:10px;height:10px;border-radius:50%;background:#5fd08a;box-shadow:0 0 0 4px rgba(95,208,138,.25)}
+  .topbar .spacer{flex:1}
+  .topbar button{
+    background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.2);
+    padding:7px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600
+  }
+  .topbar button:hover{background:rgba(255,255,255,.22)}
+  #menuToggle{display:none}
+
+  .layout{display:flex;gap:28px;max-width:1240px;margin:0 auto;padding:24px 20px 80px;align-items:flex-start}
+
+  /* sidebar TOC */
+  .toc{
+    position:sticky;top:64px;flex:0 0 268px;max-height:calc(100vh - 84px);overflow:auto;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)
+  }
+  .toc h4{margin:6px 8px 10px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .toc a{display:block;padding:7px 10px;border-radius:8px;color:var(--ink);font-size:13.5px;line-height:1.35}
+  .toc a .n{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:7px;font-size:12px}
+  .toc a:hover{background:var(--blue-soft);text-decoration:none}
+  .toc a.active{background:var(--blue-soft);color:var(--navy-2);font-weight:700}
+  body.dark .toc a.active{color:#cfe4ff}
+
+  main{flex:1;min-width:0;max-width:var(--maxw)}
+
+  /* hero */
+  .hero{
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;border-radius:16px;
+    padding:34px 32px;box-shadow:var(--shadow);margin-bottom:22px
+  }
+  .hero h1{margin:0 0 8px;font-size:30px;line-height:1.2;letter-spacing:-.01em}
+  .hero p.sub{margin:0;color:#cfe0f1;font-size:16px;max-width:60ch}
+  .hero .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .hero .meta span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:6px 11px;border-radius:999px;font-size:12.5px}
+
+  section.module{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 30px;margin-bottom:20px;box-shadow:var(--shadow);scroll-margin-top:72px
+  }
+  .module > h2{
+    margin:0 0 4px;font-size:22px;letter-spacing:-.01em;color:var(--navy-2);
+    display:flex;align-items:baseline;gap:12px
+  }
+  body.dark .module>h2{color:#bcd6f2}
+  .module > h2 .num{
+    flex:0 0 auto;font-size:13px;font-weight:800;color:#fff;background:var(--blue);
+    border-radius:8px;padding:4px 9px;letter-spacing:.04em
+  }
+  .module .lead{color:var(--muted);margin:.2em 0 1.2em;font-size:15.5px}
+  h3{margin:1.6em 0 .5em;font-size:17.5px;color:var(--ink)}
+  h4{margin:1.2em 0 .4em;font-size:15px;color:var(--ink)}
+  p{margin:.6em 0}
+  ul,ol{margin:.5em 0 .9em;padding-left:1.35em}
+  li{margin:.3em 0}
+  strong{color:var(--ink)}
+  code{background:var(--blue-soft);padding:1px 6px;border-radius:5px;font-size:.92em;color:var(--navy-2)}
+  body.dark code{color:#cfe4ff}
+
+  /* callouts */
+  .callout{border-radius:10px;padding:14px 16px 14px 16px;margin:1em 0;border:1px solid;position:relative}
+  .callout .ttl{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+  .callout p:first-of-type{margin-top:0}
+  .callout p:last-child{margin-bottom:0}
+  .c-law{background:var(--blue-soft);border-color:#bcd6f2}
+  .c-law .ttl{color:var(--navy-2)}
+  .c-deadline{background:var(--amber-soft);border-color:#f1d99a}
+  .c-deadline .ttl{color:var(--amber)}
+  .c-warn{background:var(--red-soft);border-color:#f0bcbc}
+  .c-warn .ttl{color:var(--red)}
+  .c-tip{background:var(--green-soft);border-color:#b6e0c6}
+  .c-tip .ttl{color:var(--green)}
+  .c-workday{background:var(--purple-soft);border-color:#cdbfe8}
+  .c-workday .ttl{color:var(--purple)}
+
+  /* tables */
+  .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px;margin:1em 0}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{background:var(--navy);color:#fff;position:sticky;top:0;font-size:12.5px;letter-spacing:.02em}
+  tbody tr:nth-child(even){background:rgba(47,109,176,.04)}
+  body.dark tbody tr:nth-child(even){background:rgba(47,109,176,.10)}
+  td.center,th.center{text-align:center}
+
+  /* list A/B/C cards */
+  .doccols{display:grid;grid-template-columns:1fr;gap:16px;margin:1em 0}
+  @media(min-width:760px){.doccols{grid-template-columns:1fr 1fr 1fr}}
+  .doccard{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+  .doccard .hd{padding:12px 14px;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+  .doccard.a .hd{background:var(--green)}
+  .doccard.b .hd{background:var(--blue)}
+  .doccard.c .hd{background:var(--purple)}
+  .doccard .hd small{font-weight:600;opacity:.92;font-size:11.5px}
+  .doccard ul{margin:0;padding:12px 14px 14px 30px;font-size:13.5px}
+  .doccard .foot{padding:0 14px 14px;font-size:12px;color:var(--muted)}
+  .vs{display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted)}
+
+  /* badges / pills */
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em}
+  .pill.ok{background:var(--green-soft);color:var(--green)}
+  .pill.no{background:var(--red-soft);color:var(--red)}
+  .pill.warn{background:var(--amber-soft);color:var(--amber)}
+  .pill.info{background:var(--blue-soft);color:var(--navy-2)}
+
+  /* do / don't grid */
+  .ddgrid{display:grid;gap:14px;grid-template-columns:1fr;margin:1em 0}
+  @media(min-width:680px){.ddgrid{grid-template-columns:1fr 1fr}}
+  .ddcol{border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .ddcol.do{background:var(--green-soft);border-color:#b6e0c6}
+  .ddcol.dont{background:var(--red-soft);border-color:#f0bcbc}
+  .ddcol h4{margin:.1em 0 .5em;display:flex;align-items:center;gap:8px}
+  .ddcol.do h4{color:var(--green)} .ddcol.dont h4{color:var(--red)}
+  .ddcol ul{padding-left:1.2em;margin:.3em 0 0}
+
+  /* timeline */
+  .timeline{position:relative;margin:1.2em 0 1em;padding-left:30px}
+  .timeline::before{content:"";position:absolute;left:9px;top:4px;bottom:4px;width:3px;background:linear-gradient(var(--blue),var(--green))}
+  .tl-item{position:relative;margin:0 0 16px}
+  .tl-item::before{content:"";position:absolute;left:-26px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--card);border:3px solid var(--blue)}
+  .tl-item.green::before{border-color:var(--green)}
+  .tl-item.amber::before{border-color:var(--amber)}
+  .tl-item .when{font-weight:800;color:var(--navy-2);font-size:14px}
+  body.dark .tl-item .when{color:#bcd6f2}
+
+  /* knowledge check */
+  .kc{border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:14px 16px;margin:1.2em 0;background:var(--card)}
+  .kc .tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:6px}
+  .kc .kc-q{font-weight:700;margin:.1em 0 .7em}
+  .kc-options{display:flex;flex-direction:column;gap:8px}
+  .kc-opt{
+    text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:10px 12px;
+    cursor:pointer;font:inherit;color:var(--ink);transition:.12s;display:flex;gap:9px;align-items:flex-start
+  }
+  .kc-opt:hover{border-color:var(--blue);background:var(--blue-soft)}
+  .kc-opt .mk{flex:0 0 20px;height:20px;border-radius:50%;border:2px solid var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--muted)}
+  .kc-opt.selected{border-color:var(--blue)}
+  .kc-opt.correct{border-color:var(--green);background:var(--green-soft)}
+  .kc-opt.correct .mk{border-color:var(--green);background:var(--green);color:#fff}
+  .kc-opt.incorrect{border-color:var(--red);background:var(--red-soft)}
+  .kc-opt.incorrect .mk{border-color:var(--red);background:var(--red);color:#fff}
+  .kc-explain{display:none;margin-top:10px;padding:11px 13px;background:var(--blue-soft);border-radius:8px;font-size:13.5px}
+  .kc-explain.show{display:block}
+  .kc-explain b{color:var(--navy-2)}
+  body.dark .kc-explain b{color:#cfe4ff}
+
+  /* checklist */
+  .checklist{list-style:none;padding:0;margin:1em 0}
+  .checklist li{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);border-radius:9px;margin:7px 0;background:var(--card)}
+  .checklist input{margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--green)}
+  .checklist label{cursor:pointer}
+  .checklist input:checked + label{color:var(--muted);text-decoration:line-through}
+
+  details{border:1px solid var(--line);border-radius:10px;margin:.9em 0;background:var(--card);overflow:hidden}
+  summary{cursor:pointer;padding:12px 15px;font-weight:700;background:var(--blue-soft);color:var(--navy-2);list-style:none}
+  body.dark summary{color:#cfe4ff}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--blue)}
+  details[open] summary::before{content:"▾ "}
+  details .body{padding:6px 16px 14px}
+
+  .scenario{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:1em 0;background:linear-gradient(180deg,var(--bg),var(--card))}
+  .scenario .lbl{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--purple)}
+
+  .quiz-head{background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border-radius:12px;padding:18px 22px;margin-bottom:14px}
+  .quiz-head h3{color:#fff;margin:0 0 4px}
+  #quiz-result{display:none;margin:14px 0;padding:16px 18px;border-radius:12px;font-weight:700;font-size:16px}
+  #quiz-result.show{display:block}
+  .btn-primary{background:var(--blue);color:#fff;border:none;padding:12px 20px;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer}
+  .btn-primary:hover{background:var(--navy-2)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:11px 16px;border-radius:10px;font-weight:700;cursor:pointer}
+
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:1em 0}
+  @media(min-width:620px){.kpis{grid-template-columns:repeat(4,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;background:var(--card)}
+  .kpi .big{font-size:26px;font-weight:900;color:var(--navy-2);line-height:1}
+  body.dark .kpi .big{color:#bcd6f2}
+  .kpi .lab{font-size:12px;color:var(--muted);margin-top:6px}
+
+  hr.soft{border:none;border-top:1px solid var(--line);margin:1.6em 0}
+  .footnote{font-size:13px;color:var(--muted)}
+  .anchor-top{display:inline-block;margin-top:10px;font-size:13px}
+
+  @media (max-width:980px){
+    .toc{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;max-height:none;flex-basis:auto;border-radius:0;z-index:55}
+    .toc.open{display:block}
+    #menuToggle{display:inline-block}
+    .layout{padding-top:16px}
+  }
+  @media print{
+    .topbar,.toc,#progress,.kc-options,.btn-primary,.btn-ghost,.no-print{display:none!important}
+    body{background:#fff;font-size:12px}
+    .module,.hero{box-shadow:none;border:1px solid #ccc;break-inside:avoid}
+    .kc-explain{display:block!important;background:#f3f3f3}
+    a{color:#000;text-decoration:underline}
+    details[open] .body,details .body{display:block}
+  }
+</style>
+</head>
+<body>
+<div id="progress"><div id="progress-bar"></div></div>
+
+<div class="topbar">
+  <span class="brand"><span class="dot"></span> People Services Academy</span>
+  <button id="menuToggle" aria-label="Toggle contents">☰ Contents</button>
+  <span class="spacer"></span>
+  <button id="expandAll" class="no-print">Expand all</button>
+  <button id="printBtn" class="no-print">🖨 Print / PDF</button>
+  <button id="themeBtn" class="no-print">🌙 Theme</button>
+</div>
+
+<div class="layout">
+  <nav class="toc" id="toc">
+    <h4>Training Contents</h4>
+    <a href="#start"><span class="n">★</span>Start here &amp; how to use</a>
+    <a href="#m1"><span class="n">1</span>Foundations &amp; the law</a>
+    <a href="#m2"><span class="n">2</span>The Form I-9 (anatomy)</a>
+    <a href="#m3"><span class="n">3</span>Deadlines &amp; timelines</a>
+    <a href="#m4"><span class="n">4</span>Section 1 (employee)</a>
+    <a href="#m5"><span class="n">5</span>Acceptable documents</a>
+    <a href="#m6"><span class="n">6</span>Section 2 (employer)</a>
+    <a href="#m7"><span class="n">7</span>Supplements A &amp; B</a>
+    <a href="#m8"><span class="n">8</span>E-Verify fundamentals</a>
+    <a href="#m9"><span class="n">9</span>Cases in Workday</a>
+    <a href="#m10"><span class="n">10</span>Results &amp; mismatch (TNC)</a>
+    <a href="#m11"><span class="n">11</span>Anti-discrimination</a>
+    <a href="#m12"><span class="n">12</span>Retention &amp; audits</a>
+    <a href="#m13"><span class="n">13</span>Corrections &amp; errors</a>
+    <a href="#m14"><span class="n">14</span>Penalties &amp; enforcement</a>
+    <a href="#m15"><span class="n">15</span>Special situations</a>
+    <a href="#ref"><span class="n">QR</span>Quick reference</a>
+    <a href="#glossary"><span class="n">G</span>Glossary</a>
+    <a href="#checklist"><span class="n">✓</span>Process checklist</a>
+    <a href="#quiz"><span class="n">★</span>Final certification quiz</a>
+    <a href="#resources"><span class="n">↗</span>Official resources</a>
+  </nav>
+
+  <main>
+    <div class="hero" id="start">
+      <h1>Form I-9 &amp; E-Verify Processing in Workday</h1>
+      <p class="sub">An exhaustive training guide for the People Services team — from legal foundations and document review through E-Verify case management, mismatch resolution, recordkeeping, and audits.</p>
+      <div class="meta">
+        <span>📋 Current form: I-9 edition 01/20/2025</span>
+        <span>🗓 Reflects rules as of June 2026</span>
+        <span>⏱ ~60–90 min self-paced</span>
+        <span>🎓 Includes knowledge checks + final quiz</span>
+      </div>
+    </div>
+
+    <div class="callout c-warn">
+      <div class="ttl">⚠ Important disclaimer — read first</div>
+      <p>This guide is <strong>internal training</strong>, not legal advice. It summarizes <strong>federal</strong> Form I-9 and E-Verify requirements as published by USCIS, DHS, SSA, and the DOJ as of June 2026. Rules, form editions, penalty amounts, and procedures change — always confirm against the live sources in <a href="#resources">Official resources</a> and your organization's Legal/Compliance team.</p>
+      <p>The <strong>Workday steps are generalized.</strong> Your tenant may use Workday's <em>native</em> E-Verify or a connected partner (e.g., Tracker I-9, Equifax/Guardian, WorkBright). Task names, screens, and automation differ by configuration. Where you see a <span class="pill info">Workday</span> box, confirm the exact step against your tenant's documented business process. Replace bracketed placeholders like <code>[your tenant]</code> before rollout.</p>
+    </div>
+
+    <section class="module">
+      <h2><span class="num">USE</span> How to use this training</h2>
+      <p class="lead">Designed to work as both a guided course and a desk reference you return to mid-task.</p>
+      <ul>
+        <li><strong>First pass:</strong> read Modules 1–15 top to bottom. Each ends with a knowledge check — answer before moving on.</li>
+        <li><strong>On the job:</strong> jump to <a href="#ref">Quick reference</a> for the deadline cheat-sheet, document pocket guide, and mismatch flow.</li>
+        <li><strong>Certify:</strong> finish with the <a href="#quiz">final quiz</a> (aim for 80%+). Your <a href="#checklist">process checklist</a> ticks persist in this browser.</li>
+        <li><strong>Print:</strong> use the toolbar to export a clean PDF for your records (answers and explanations are included automatically).</li>
+      </ul>
+      <div class="callout c-tip">
+        <div class="ttl">🎯 Who this is for</div>
+        <p>People Services / HR Operations staff who complete <strong>Section 2</strong>, create and manage <strong>E-Verify cases</strong>, resolve <strong>mismatches</strong>, and maintain <strong>I-9 records</strong> in Workday. Employees complete Section 1 themselves; your job is everything after.</p>
+      </div>
+    </section>
+
+    <!-- ===================== MODULE 1 ===================== -->
+    <section class="module" id="m1">
+      <h2><span class="num">1</span> Foundations &amp; the law</h2>
+      <p class="lead">Why the I-9 exists, who enforces it, and where People Services fits.</p>
+
+      <h3>The legal basis</h3>
+      <p>The <strong>Immigration Reform and Control Act of 1986 (IRCA)</strong> amended the Immigration and Nationality Act (<strong>INA §274A</strong>) to make it unlawful to knowingly hire or continue to employ a person not authorized to work in the U.S. To enforce this, every U.S. employer must verify the <strong>identity</strong> and <strong>employment authorization</strong> of each person hired after November 6, 1986, by completing <strong>Form I-9, Employment Eligibility Verification</strong>.</p>
+      <p>Two things are <em>always</em> required; a third may apply:</p>
+      <div class="kpis">
+        <div class="kpi"><div class="big">I-9</div><div class="lab">Mandatory for every U.S. hire</div></div>
+        <div class="kpi"><div class="big">3 days</div><div class="lab">To complete Section 2 / open E-Verify</div></div>
+        <div class="kpi"><div class="big">E-Verify</div><div class="lab">Required for some, voluntary for others</div></div>
+        <div class="kpi"><div class="big">Keep</div><div class="lab">Records retained &amp; available to inspect</div></div>
+      </div>
+
+      <h3>The agencies you'll hear about</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Agency</th><th>Role in I-9 / E-Verify</th></tr></thead>
+          <tbody>
+            <tr><td><strong>USCIS</strong> (within DHS)</td><td>Publishes Form I-9 and the M-274 Handbook; operates E-Verify.</td></tr>
+            <tr><td><strong>DHS — ICE / HSI</strong></td><td>Conducts worksite enforcement and I-9 audits (issues the Notice of Inspection).</td></tr>
+            <tr><td><strong>SSA</strong></td><td>Provides the Social Security data E-Verify checks; resolves SSA mismatches.</td></tr>
+            <tr><td><strong>DOJ — IER</strong> (Immigrant &amp; Employee Rights Section)</td><td>Enforces the INA's anti-discrimination &amp; "document abuse" rules.</td></tr>
+            <tr><td><strong>DOL</strong></td><td>May inspect I-9s during wage/hour and other investigations.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout c-law">
+        <div class="ttl">§ The three legal duties you must balance</div>
+        <p><strong>1) Verify</strong> work authorization (don't employ the unauthorized). <strong>2) Don't over-verify</strong> or discriminate (don't demand specific or extra documents based on how someone looks or sounds). <strong>3) Don't under-verify</strong> (don't skip the form or accept obviously invalid documents). Most violations come from leaning too far one way. Your training is largely about staying in the middle.</p>
+      </div>
+
+      <h3>Who must have an I-9 — and who's excluded</h3>
+      <ul>
+        <li><strong>Required:</strong> every employee hired to work in the U.S. for wages or other remuneration, regardless of citizenship.</li>
+        <li><strong>Not required:</strong> independent contractors and their employees; certain casual domestic workers; people doing sporadic/irregular work; employees hired on or before Nov 6, 1986 in continuous employment; and individuals not physically working in the U.S.</li>
+      </ul>
+      <div class="callout c-warn">
+        <div class="ttl">⚠ Never use I-9 status to "pre-screen"</div>
+        <p>You may <strong>not</strong> ask for I-9 documents or run E-Verify before a person has accepted a job offer and (for E-Verify) actually started. Verification belongs to onboarding, not recruiting.</p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">A hiring manager wants to confirm a finalist "can legally work here" before extending an offer and asks you to run E-Verify. What's correct?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Run E-Verify right away — it protects the company.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Decline — E-Verify and I-9 verification only happen after hire/start, never as pre-screening.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Ask the candidate to email a copy of their green card instead.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> Pre-screening with E-Verify or demanding documents before hire is prohibited and is a common discrimination finding. Verification is part of onboarding after the person is hired and (for E-Verify) has started work.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 2 ===================== -->
+    <section class="module" id="m2">
+      <h2><span class="num">2</span> The Form I-9 — anatomy &amp; current edition</h2>
+      <p class="lead">Know the form before you process it.</p>
+
+      <div class="callout c-deadline">
+        <div class="ttl">🗓 Current edition &amp; the electronic-system deadline</div>
+        <p>The current Form I-9 is <strong>edition 01/20/2025</strong>, valid through <strong>05/31/2027</strong>. The <strong>08/01/2023</strong> edition is also still acceptable through 05/31/2027. <strong>Electronic I-9 systems (including Workday) must be updated to the version showing the 05/31/2027 expiration date by 07/31/2026.</strong> The visible change in the 01/20/2025 edition: List B's descriptor changed from "gender" to "sex," plus updated Section 1 status wording. Always confirm the live edition at <a href="#resources">uscis.gov/i-9</a>.</p>
+      </div>
+
+      <h3>The four parts of the form</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Part</th><th>Who completes it</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Section 1</strong> — Employee Information &amp; Attestation</td><td>The employee (the new hire)</td><td>Identity info + attestation of citizenship/immigration status, signed under penalty of perjury.</td></tr>
+            <tr><td><strong>Section 2</strong> — Employer Review &amp; Verification</td><td><strong>You</strong> (People Services)</td><td>Record the documents the employee presents and certify you examined them.</td></tr>
+            <tr><td><strong>Supplement A</strong> — Preparer &amp;/or Translator Certification</td><td>Anyone who helped the employee fill out Section 1</td><td>Used only when someone assists or translates for the employee.</td></tr>
+            <tr><td><strong>Supplement B</strong> — Reverification &amp; Rehire</td><td><strong>You</strong> (People Services)</td><td>Reverify expiring work authorization, or record a rehire. (Replaces the old "Section 3.")</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">The modern form merges Sections 1 &amp; 2 onto a single page and moves preparer/translator and reverification into separate Supplements. If you ever see "Section 3," you're looking at an obsolete edition.</p>
+
+      <h3>Paper vs. electronic (Workday)</h3>
+      <p>An electronically completed and stored I-9 is fully valid if the system meets DHS standards for accuracy, integrity, security, and audit trails, and can reproduce legible copies on request. Workday (or your connected I-9 partner) is your <strong>system of record</strong>. Practical implications:</p>
+      <ul>
+        <li>Electronic signatures with timestamp and an audit trail satisfy the signature requirement.</li>
+        <li>The system must retain document images you upload and let you produce them during an audit.</li>
+        <li>You still follow the same deadlines and document rules — the medium changes, the law doesn't.</li>
+      </ul>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday — typical flow</div>
+        <p>New hire completes <strong>Section 1</strong> as an onboarding self-service task (often "Complete Form I-9"). It then routes to a People Services queue as a <strong>"Complete I-9 / Verify Documents (Section 2)"</strong> task. If E-Verify is enabled, a <strong>case</strong> is generated from the same data after Section 2. <em>Confirm exact task labels in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <div class="kc" data-answer="2">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">A returning hire's record references a "Section 3." What does that tell you?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>It's the preparer/translator section.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>It's the current reverification page.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>It's from an obsolete edition — reverification/rehire is now Supplement B.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: C.</b> "Section 3" only exists on retired editions. Today, rehire and reverification live on <b>Supplement B</b>, and preparer/translator on <b>Supplement A</b>.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 3 ===================== -->
+    <section class="module" id="m3">
+      <h2><span class="num">3</span> Deadlines &amp; timelines — the master rule</h2>
+      <p class="lead">If you remember one thing from this training, remember the clock.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="when">Before the first day (after offer accepted)</div>
+          <div>Section 1 may be completed any time <strong>after acceptance of the job offer</strong>. It must never be required before an offer is accepted.</div>
+        </div>
+        <div class="tl-item green">
+          <div class="when">By the end of Day 1 (first day of work for pay)</div>
+          <div><strong>Section 1 must be complete</strong> — signed and dated by the employee no later than the end of their first day of employment.</div>
+        </div>
+        <div class="tl-item amber">
+          <div class="when">Within 3 business days of the start date</div>
+          <div><strong>Section 2 must be complete</strong> (you examined documents and signed). <strong>The E-Verify case must be created</strong> by this same deadline.</div>
+        </div>
+        <div class="tl-item">
+          <div class="when">On/before the work-authorization expiration date</div>
+          <div><strong>Reverify</strong> in Supplement B when temporary work authorization expires (only for those who require it — see Module 7).</div>
+        </div>
+      </div>
+
+      <div class="callout c-deadline">
+        <div class="ttl">🗓 The "3 business days" detail everyone gets wrong</div>
+        <p>Section 2 is due <strong>within 3 business days of the first day of employment</strong> — meaning if someone starts Monday, you have through end of <strong>Thursday</strong> (the start day + 3). If the job lasts <strong>less than 3 business days</strong>, Section 2 must be done by the <strong>end of the first day</strong>. "Business days" exclude weekends and federal holidays.</p>
+      </div>
+
+      <h3>What counts as the "first day of employment"?</h3>
+      <p>It's the first day the employee works <strong>for pay</strong> — not the offer date, not orientation if unpaid, not the badge-pickup day. Anchor every deadline to this date. In Workday, this is typically the <strong>Hire Date / Start Date</strong> on the position; verify it's accurate because every clock keys off it.</p>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ Late is a violation — but never backdate</div>
+        <p>If Section 2 or an E-Verify case is late, complete it <strong>immediately</strong> using the <strong>actual</strong> date you do the work. Never backdate a form or a case. For a late E-Verify case, the system will ask for a reason — give the honest one. A late-but-truthful record is defensible; a falsified date is fraud.</p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">An employee's first paid day is <strong>Tuesday</strong>. By when must Section 2 be completed (assume no holidays)?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>End of Tuesday.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>End of Friday (start day + 3 business days).</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Within 3 business days of when documents arrive.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> Count the first day plus three business days: Tue → Wed, Thu, Fri. The clock runs from the start date, not from when documents happen to show up.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 4 ===================== -->
+    <section class="module" id="m4">
+      <h2><span class="num">4</span> Section 1 — Employee information &amp; attestation</h2>
+      <p class="lead">The employee owns this section. Your job is to make sure it's done correctly and on time — without doing it for them.</p>
+
+      <h3>What the employee provides</h3>
+      <ul>
+        <li>Full legal name (and any other names used), address, date of birth.</li>
+        <li><strong>Social Security Number</strong> — optional <em>unless</em> the employer uses E-Verify, in which case it is <strong>required</strong>. (See SSN-pending in Module 15.)</li>
+        <li>Email and phone — optional.</li>
+        <li><strong>Citizenship/immigration status attestation</strong> — exactly one of four boxes.</li>
+        <li>Employee signature and date.</li>
+      </ul>
+
+      <h3>The four attestation categories</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Status</th><th>Extra info required</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>A citizen of the United States</td><td>None.</td></tr>
+            <tr><td>2</td><td>A noncitizen national of the United States</td><td>None (rare — e.g., American Samoa).</td></tr>
+            <tr><td>3</td><td>A lawful permanent resident</td><td>USCIS / Alien Number (A-Number).</td></tr>
+            <tr><td>4</td><td>A noncitizen authorized to work</td><td>Work-authorization <strong>expiration date</strong> (if any) plus one of: A-Number/USCIS Number, Form I-94 admission number, or foreign passport number + country.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ You may guide, but you may not choose</div>
+        <p>You can point an employee to instructions and answer process questions, but you must not select their status, tell them which documents to bring, or fill in attestation fields for them. If you actively help complete or translate Section 1, that assistance must be recorded in <strong>Supplement A</strong>.</p>
+      </div>
+
+      <h3>Common Section 1 errors to catch before you sign Section 2</h3>
+      <ul>
+        <li>No box checked, or more than one box checked.</li>
+        <li>Status #3 or #4 selected but the required number/expiration left blank.</li>
+        <li>Missing employee signature or date; date doesn't match the actual day signed.</li>
+        <li>Section 1 dated <strong>after</strong> the first day of work (late) — note the real dates; don't paper over it.</li>
+        <li>Someone assisted but Supplement A wasn't completed.</li>
+      </ul>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday</div>
+        <p>Section 1 is usually a new-hire onboarding task the employee completes via self-service before or on Day 1. People Services can <strong>monitor completion</strong> from the onboarding dashboard and nudge stragglers. You generally <strong>cannot edit</strong> the employee's Section 1 entries — if something's wrong, the employee corrects it (or you use the documented correction path). <em>Confirm the task name and correction routing in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <div class="kc" data-answer="0">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">A new hire selects "A lawful permanent resident" but leaves the number blank, and a colleague translated the form for them. What must be true before you complete Section 2?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>The employee adds their A-Number/USCIS Number, and the translator completes Supplement A.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>You fill in the number from their green card to save time.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Nothing — Section 1 numbers are optional.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: A.</b> Status #3 requires the A-Number/USCIS Number, and any translator/preparer assistance must be recorded in Supplement A. You don't complete the employee's attestation fields for them.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 5 ===================== -->
+    <section class="module" id="m5">
+      <h2><span class="num">5</span> Acceptable documents — Lists A, B &amp; C</h2>
+      <p class="lead">The employee chooses what to present from the Lists of Acceptable Documents. You verify it fits the rules — you never dictate the choice.</p>
+
+      <div class="callout c-law">
+        <div class="ttl">§ The core rule</div>
+        <p>The employee presents <strong>either ONE document from List A</strong> (proves identity <em>and</em> work authorization) <strong>OR a combination of ONE document from List B</strong> (identity) <strong>plus ONE from List C</strong> (work authorization). That's it: <strong>A — or — B + C</strong>.</p>
+      </div>
+
+      <div class="doccols">
+        <div class="doccard a">
+          <div class="hd"><span>LIST A</span><small>Identity + Work Auth</small></div>
+          <ul>
+            <li>U.S. Passport or Passport Card</li>
+            <li>Permanent Resident Card (Form I-551, "green card")</li>
+            <li>Foreign passport with a temporary I-551 stamp/MRIV</li>
+            <li>Employment Authorization Document with photo (Form I-766, "EAD")</li>
+            <li>For specific-employer-authorized workers: foreign passport + Form I-94 with endorsement</li>
+            <li>FSM/RMI passport + Form I-94 (Compact of Free Association)</li>
+          </ul>
+          <div class="foot">Present <strong>one</strong> = done.</div>
+        </div>
+        <div class="doccard b">
+          <div class="hd"><span>LIST B</span><small>Identity only</small></div>
+          <ul>
+            <li>State driver's license or ID card with photo/info</li>
+            <li>Federal/state/local government ID card</li>
+            <li>School ID with photo</li>
+            <li>Voter registration card</li>
+            <li>U.S. military card or draft record; military dependent ID</li>
+            <li>USCG Merchant Mariner card; Native American tribal document</li>
+            <li>Canadian driver's license</li>
+            <li>Minors under 18: school/clinic/daycare record</li>
+          </ul>
+          <div class="foot">Pair with a List C document.</div>
+        </div>
+        <div class="doccard c">
+          <div class="hd"><span>LIST C</span><small>Work Auth only</small></div>
+          <ul>
+            <li>Unrestricted Social Security card*</li>
+            <li>Birth certificate (original/certified, U.S.)</li>
+            <li>Certification of Birth Abroad (FS-545, DS-1350, FS-240)</li>
+            <li>Native American tribal document</li>
+            <li>U.S. Citizen ID Card (Form I-197)</li>
+            <li>Resident Citizen ID Card (Form I-179)</li>
+            <li>DHS-issued employment authorization document</li>
+          </ul>
+          <div class="foot">*Not valid if marked "not valid for employment" / "valid for work only with DHS authorization."</div>
+        </div>
+      </div>
+
+      <h3>Rules that apply to <em>every</em> document</h3>
+      <ul>
+        <li><strong>Unexpired.</strong> Expired documents are not acceptable (narrow auto-extension exceptions exist — see Module 15).</li>
+        <li><strong>Original.</strong> Photocopies are not acceptable — the one exception is a <strong>certified copy of a birth certificate</strong>.</li>
+        <li><strong>Genuine &amp; relates to the person.</strong> It must reasonably appear authentic and to belong to the employee presenting it. You are not a forensic examiner — apply a reasonable-person standard.</li>
+        <li><strong>List B must have a photograph</strong> if the employer participates in E-Verify (so photo matching can work) — confirm your policy.</li>
+      </ul>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ Document abuse — the most common discrimination trap</div>
+        <p>You may <strong>not</strong>: demand a <em>specific</em> document (e.g., "I need to see your green card"); ask for <em>more</em> documents than the rules require; reject a valid, genuine-looking document; or treat people differently based on citizenship status or national origin. The employee decides which acceptable document(s) to present. Your only question is "does this satisfy A, or B+C?"</p>
+      </div>
+
+      <h3>Receipts (temporary stand-ins)</h3>
+      <p>A "receipt" can be accepted in limited cases:</p>
+      <ul>
+        <li><strong>Receipt for a lost/stolen/damaged document</strong> — valid for <strong>90 days</strong>; then the employee must present the actual replacement document.</li>
+        <li><strong>Arrival portion of Form I-94 with a temporary I-551 stamp</strong> — acts as a List A receipt; present the actual green card when received.</li>
+        <li><strong>Refugee's Form I-94 with refugee admission stamp</strong> — receipt for List A; within 90 days present an EAD or a List B doc + unrestricted SS card.</li>
+      </ul>
+      <p class="footnote">A receipt is never acceptable if the person's actual employment will last fewer than 3 business days.</p>
+
+      <details>
+        <summary>Deep dive: minors, special placements &amp; "reasonably genuine"</summary>
+        <div class="body">
+          <p><strong>Minors under 18</strong> who cannot present a List B identity document may use a school record/report card, a clinic/doctor/hospital record, or a daycare/nursery record, paired with a List C document. The parent/guardian completes the preparer area as needed.</p>
+          <p><strong>Certain people with disabilities</strong> (in specified placement programs) have a parallel special rule for the identity document.</p>
+          <p><strong>"Reasonably appears genuine"</strong> means a reasonable person would accept it. If a document is obviously altered, doesn't match the person, or is clearly not on the Lists, do not accept it — but ask for clarification respectfully and let the employee present an alternative acceptable document. When in doubt, escalate to your lead/Legal before rejecting.</p>
+        </div>
+      </details>
+
+      <div class="kc" data-answer="2">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">An employee offers a <strong>state driver's license</strong> and an <strong>unrestricted Social Security card</strong>. You'd prefer a passport "to keep it simple." What do you do?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Ask for the passport instead — fewer fields.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Require both the passport and the two documents to be safe.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Accept the License (List B) + SS card (List C) — that's a valid B+C combination.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: C.</b> A valid List B + List C combination fully satisfies the requirement. Demanding a specific document (the passport) or extra documents is document abuse.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 6 ===================== -->
+    <section class="module" id="m6">
+      <h2><span class="num">6</span> Section 2 — Employer review &amp; verification</h2>
+      <p class="lead">This is your core task. Examine the documents, record them accurately, and certify — within 3 business days.</p>
+
+      <h3>Step by step</h3>
+      <ol>
+        <li><strong>Confirm Section 1 is complete and signed</strong> (and timely). Don't proceed on an incomplete Section 1.</li>
+        <li><strong>Examine the original document(s)</strong> the employee presents — physically in person, or via the <em>remote alternative procedure</em> if you qualify (below).</li>
+        <li><strong>Check:</strong> unexpired, original, reasonably genuine, relates to this person, and satisfies A or B+C.</li>
+        <li><strong>Record</strong> each document's <strong>title, issuing authority, document number, and expiration date</strong> in the correct List column. Don't mix a List A entry with B/C entries.</li>
+        <li><strong>Enter the employee's first day of employment</strong> (start date) in the certification.</li>
+        <li><strong>Sign &amp; date</strong> the employer certification (your name, title, and the business name/address).</li>
+        <li>If using the remote procedure, <strong>check the alternative-procedure box</strong> and retain copies.</li>
+      </ol>
+
+      <div class="callout c-law">
+        <div class="ttl">§ Examine the real thing — physically or by the approved remote procedure</div>
+        <p>The default is <strong>physical, in-person</strong> examination of original documents. As a permanent option, <strong>E-Verify employers in good standing</strong> may use the DHS <strong>remote alternative procedure</strong>: examine front/back copies, conduct a <strong>live video interaction</strong> with the employee holding the documents, retain clear copies, and check the alternative-procedure box on the I-9. If you offer it at a site, offer it <strong>consistently</strong> (don't pick and choose by person).</p>
+      </div>
+
+      <div class="callout c-deadline">
+        <div class="ttl">🗓 Three business days — from the start date</div>
+        <p>Section 2 must be signed within 3 business days of the first day of employment. Same deadline as opening the E-Verify case. Don't wait for "a batch" — process each new hire on its own clock.</p>
+      </div>
+
+      <h3>The "Additional Information" box</h3>
+      <p>Use it to note things that affect the record: receipt details and follow-up dates, EAD auto-extension facts, the remote-examination method, termination dates, etc. Keep notes factual and dated.</p>
+
+      <h3>Common Section 2 mistakes</h3>
+      <ul>
+        <li>Recording a document in the wrong List column (e.g., putting a List A item under B).</li>
+        <li>Filling in <strong>both</strong> a List A entry <strong>and</strong> B+C entries (you pick one path, not both).</li>
+        <li>Missing issuing authority, number, or expiration date.</li>
+        <li>Missing the employer signature, title, or date.</li>
+        <li>Wrong first-day-of-employment date in the certification.</li>
+        <li>Accepting an expired or photocopied document.</li>
+      </ul>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday</div>
+        <p>Open the <strong>"Verify I-9 / Complete Form I-9 (Section 2)"</strong> task from your inbox. Workday pre-fills the employee's name and start date; you select the document(s), enter title/authority/number/expiration, and upload images. Many tenants <strong>require document images</strong> and validate that you complete either List A or List B+C (not both). Submitting Section 2 typically <strong>triggers the E-Verify case</strong> (Module 9). <em>Confirm whether image upload is mandatory and how remote-procedure is flagged in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">You're completing Section 2 and the employee presented a U.S. Passport (List A). How should you record it?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Record the passport under List A <em>and</em> also ask for a List C document.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Record only the List A entry (title, authority, number, expiration); leave B and C blank.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Record it under List B since it has a photo.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> One List A document stands alone — complete the List A fields only. Don't also fill List B/C, and don't ask for extra documents.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 7 ===================== -->
+    <section class="module" id="m7">
+      <h2><span class="num">7</span> Supplement A (preparer/translator) &amp; Supplement B (reverification &amp; rehire)</h2>
+      <p class="lead">Two supplements handle help with the form and the life-cycle events that come after onboarding.</p>
+
+      <h3>Supplement A — Preparer and/or Translator Certification</h3>
+      <ul>
+        <li>Used when <strong>anyone other than the employee</strong> helps fill out or translate <strong>Section 1</strong>.</li>
+        <li>The helper records their name/address and signs. A separate area exists for multiple preparers/translators across the form's life.</li>
+        <li>If <strong>no one</strong> assisted, the employee checks that box and Supplement A is not used.</li>
+      </ul>
+
+      <h3>Supplement B — Reverification &amp; Rehire</h3>
+      <p>This replaces the old Section 3. You (People Services) complete it for two situations:</p>
+
+      <h4>A) Reverification of expiring work authorization</h4>
+      <div class="callout c-law">
+        <div class="ttl">§ Who gets reverified — and who never does</div>
+        <p><strong>Reverify</strong> only employees whose <strong>employment authorization or the document proving it has an expiration date</strong> (e.g., many EAD holders). <strong>Do NOT reverify:</strong> U.S. citizens and noncitizen nationals; <strong>lawful permanent residents</strong> who showed a green card (even when the card itself expires); or <strong>List B identity documents</strong> (an expired driver's license is not a reverification trigger).</p>
+      </div>
+      <ul>
+        <li><strong>When:</strong> on or before the work-authorization expiration date — never let it lapse.</li>
+        <li><strong>What:</strong> the employee presents an unexpired List A <em>or</em> List C document of their choice (you don't dictate which). Record it in Supplement B and sign.</li>
+        <li><strong>Tickler:</strong> track expiration dates proactively; start the process well ahead (e.g., 90 days out).</li>
+      </ul>
+
+      <h4>B) Rehire</h4>
+      <ul>
+        <li>If you rehire someone <strong>within 3 years</strong> of the original I-9 date, you may complete Supplement B on the existing I-9 instead of a new form — <em>if</em> the original is still valid and on the current rules.</li>
+        <li>If their authorization has since changed/expired, reverify at the same time.</li>
+        <li>Many organizations simply complete a <strong>new I-9</strong> for rehires to stay clean — follow your policy.</li>
+      </ul>
+
+      <h4>C) Name changes</h4>
+      <p>You may record a legal name change in Supplement B. There's no requirement to see documentation of a name change, though noting the basis is good practice.</p>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday</div>
+        <p>Expiring-authorization <strong>reverification tasks</strong> are often auto-generated from the work-auth expiration date captured at hire and surface in a People Services queue ahead of expiration. Rehires may launch a Supplement B or a fresh I-9 depending on configuration. <em>Confirm how your tenant triggers reverification ticklers and whether rehire creates a new I-9 in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <div class="kc" data-answer="2">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">A lawful permanent resident's green card is about to expire. The original I-9 used that card for List A. Do you reverify?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Yes — any expiring document triggers reverification.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Yes, and demand the renewed green card.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>No — LPRs are not reverified, even when the green card expires.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: C.</b> Permanent residents' work authorization doesn't lapse with the card. Reverifying an LPR (or demanding a renewed card) is a classic over-verification/document-abuse error.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 8 ===================== -->
+    <section class="module" id="m8">
+      <h2><span class="num">8</span> E-Verify fundamentals</h2>
+      <p class="lead">E-Verify is an electronic confirmation layer on top of the I-9 — not a replacement for it.</p>
+
+      <h3>What it is</h3>
+      <p>E-Verify is a free, web-based system run by <strong>USCIS (DHS)</strong> in partnership with the <strong>SSA</strong>. It compares the information from an employee's Form I-9 against DHS and SSA records to confirm employment eligibility. You still complete the I-9; E-Verify checks it.</p>
+
+      <h3>Who must use it</h3>
+      <ul>
+        <li><strong>Voluntary</strong> for most private employers — but once enrolled, you must follow the MOU and use it for <strong>all new hires</strong> at participating sites (no cherry-picking).</li>
+        <li><strong>Mandatory</strong> for many <strong>federal contractors/subcontractors</strong> with the FAR E-Verify clause, and under various <strong>state laws</strong>.</li>
+      </ul>
+
+      <div class="callout c-law">
+        <div class="ttl">§ The rules of use (memorize these)</div>
+        <ul style="margin:.2em 0">
+          <li><strong>No pre-screening:</strong> create a case only <em>after</em> hire and start, never for applicants.</li>
+          <li><strong>No selective verification:</strong> run every new hire at a participating site, not just some.</li>
+          <li><strong>No adverse action while a case is open/contested:</strong> you may not fire, suspend, dock pay, delay start/training, or otherwise penalize someone because of a pending case or a mismatch they're contesting.</li>
+          <li><strong>Generally don't run existing employees</strong> (FAR contractors are an exception per their clause).</li>
+          <li><strong>Post the notices:</strong> display the E-Verify Participation and the IER "Right to Work" posters (English &amp; Spanish) where applicants/employees can see them.</li>
+        </ul>
+      </div>
+
+      <h3>Enrollment &amp; the MOU</h3>
+      <p>Participation requires enrollment and signing a Memorandum of Understanding (MOU) that binds the employer to E-Verify's rules. Designated, trained users create and manage cases. Your organization is already enrolled — your job is correct day-to-day use.</p>
+
+      <h3>Photo matching</h3>
+      <p>When an employee presents a <strong>U.S. Passport/Passport Card</strong>, <strong>Permanent Resident Card (I-551)</strong>, or <strong>EAD (I-766)</strong>, E-Verify displays a photo from government records. You must <strong>compare it to the photo on the document the employee gave you</strong> and confirm whether they match. This is why a photo is needed on documents for E-Verify employers.</p>
+
+      <div class="kc" data-answer="0">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">Your company is enrolled in E-Verify. A manager asks you to "only run E-Verify on people we're unsure about." Correct response?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>No — once enrolled, you must run E-Verify for all new hires at participating sites; selective use is prohibited.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Sure — running fewer cases reduces risk.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Only run it for non-citizens.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: A.</b> Selective verification — including running only non-citizens — violates the MOU and anti-discrimination law. Enrolled sites verify <b>every</b> new hire.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 9 ===================== -->
+    <section class="module" id="m9">
+      <h2><span class="num">9</span> Creating &amp; managing E-Verify cases in Workday</h2>
+      <p class="lead">Where the I-9 data becomes a verified case. The exact screens depend on whether your tenant uses native Workday E-Verify or a connected partner.</p>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 Two common configurations</div>
+        <p><strong>(a) Native Workday E-Verify</strong> — completing Section 2 generates the case inside Workday; results and follow-up tasks appear in your Workday inbox. <strong>(b) Connected partner</strong> (Tracker I-9, Equifax/Guardian, WorkBright, etc.) — Workday passes data to the partner, where case actions happen, sometimes via single sign-on. <strong>Identify which one you use</strong> and substitute the exact task names below. <em>Document the path for <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <h3>When to create the case</h3>
+      <div class="callout c-deadline">
+        <div class="ttl">🗓 Within 3 business days of the start date</div>
+        <p>Create the E-Verify case no later than 3 business days after the employee's first day of employment — the same deadline as Section 2. If you're late, the system will require a reason; choose the accurate one (e.g., "Other" with a brief honest explanation). Never falsify dates.</p>
+      </div>
+
+      <h3>Step by step (generalized)</h3>
+      <ol>
+        <li><strong>Complete &amp; submit Section 2</strong> — this is what feeds the case. Verify name, DOB, SSN, citizenship status, and document data are correct; typos here cause mismatches.</li>
+        <li><strong>Generate the case</strong> from the I-9 data (automatic on Section 2 submit in many tenants, or via a "Create E-Verify Case" action).</li>
+        <li><strong>Handle photo matching</strong> if prompted (Passport/Passport Card, I-551, or I-766): compare the displayed photo to the document and answer match / no-match / no-photo-displayed.</li>
+        <li><strong>Resolve duplicate-case alerts</strong> — if E-Verify flags an existing case for the same person, review and choose the correct reason to continue (don't blindly duplicate).</li>
+        <li><strong>Record the result</strong> and act on it (Module 10).</li>
+      </ol>
+
+      <h3>SSN is required for E-Verify</h3>
+      <p>Because E-Verify checks SSA records, the SSN field on the I-9 is <strong>mandatory</strong> for E-Verify employers. If a new hire has applied for but not yet received an SSN, see the SSN-pending process in Module 15 — you complete the I-9 and <strong>delay the case</strong> until the SSN arrives, noting the reason.</p>
+
+      <h3>Case alerts &amp; dashboards</h3>
+      <p>E-Verify (and Workday/partner dashboards) surface <strong>action items</strong>: cases awaiting referral, mismatches needing notification, cases to close, photo-match steps. <strong>Work these queues daily</strong> — the legal clocks (Module 10) run whether or not you've looked.</p>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ Garbage in, mismatch out</div>
+        <p>A huge share of mismatches are <strong>data-entry errors</strong>: transposed SSN digits, wrong DOB, name mismatches (hyphenation, two last names, suffixes), or selecting the wrong citizenship status. Double-check these against the actual documents <em>before</em> submitting the case. It saves the employee a stressful mismatch and saves you the resolution work.</p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">It's day 4 after a new hire's start date and you realize the E-Verify case was never created. What do you do?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Backdate the case to day 3 so it looks on-time.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Create it now using today's real date; provide the honest "created late" reason when prompted.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Skip it — too late now.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> Always create the case as soon as you can, with truthful dates and the required late reason. Backdating is fraud; skipping abandons your obligation.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 10 ===================== -->
+    <section class="module" id="m10">
+      <h2><span class="num">10</span> E-Verify results &amp; the mismatch (TNC) process</h2>
+      <p class="lead">Most cases resolve instantly. The ones that don't have strict, employee-protective procedures — this is the highest-stakes part of your role.</p>
+
+      <h3>The possible results</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Result</th><th>Meaning</th><th>Your action</th></tr></thead>
+          <tbody>
+            <tr><td><span class="pill ok">Employment Authorized</span></td><td>Data matched DHS/SSA records.</td><td>Close the case (often automatic). Done.</td></tr>
+            <tr><td><span class="pill info">Verification in Process</span></td><td>Referred to DHS/SSA for manual review.</td><td>Wait for an update; no action yet.</td></tr>
+            <tr><td><span class="pill warn">Tentative Nonconfirmation (Mismatch)</span></td><td>Info didn't match DHS and/or SSA records — <em>not</em> a finding that the person can't work.</td><td>Run the mismatch process below — promptly.</td></tr>
+            <tr><td><span class="pill info">Case in Continuance</span></td><td>Employee contacted the agency; more time needed.</td><td>Keep the person working; wait. No adverse action.</td></tr>
+            <tr><td><span class="pill warn">Close Case and Resubmit</span></td><td>A data error needs correcting.</td><td>Close, fix the data, create a new case.</td></tr>
+            <tr><td><span class="pill no">Final Nonconfirmation</span></td><td>Eligibility could not be confirmed after the process.</td><td>You may terminate; <strong>must</strong> close the case recording the outcome.</td></tr>
+            <tr><td><span class="pill no">DHS/SSA No Action / No Show</span></td><td>Employee didn't take required action in time.</td><td>Close; may terminate per the guidance.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ A mismatch is NOT proof of anything</div>
+        <p>A Tentative Nonconfirmation (mismatch) only means the data didn't match — often due to a typo, a name change not reported to SSA, or records out of sync. You may <strong>not</strong> terminate, suspend, reduce hours/pay, delay start/training, or tell the employee they "failed." The employee has the right to contest and keep working while they do.</p>
+      </div>
+
+      <h3>The mismatch resolution timeline</h3>
+      <div class="timeline">
+        <div class="tl-item amber">
+          <div class="when">Within 10 federal working days of the mismatch — EMPLOYER</div>
+          <div>Notify the employee <strong>privately</strong> as soon as possible; give them a copy of the <strong>Further Action Notice (FAN)</strong>; review it together and have them confirm whether the info at the top is correct; the employee decides to <strong>take action</strong> (contest) or <strong>not</strong>, and you both sign. If they choose to take action, you <strong>refer</strong> the case in E-Verify and give them the <strong>Referral Date Confirmation</strong>.</div>
+        </div>
+        <div class="tl-item">
+          <div class="when">If not contested or no decision by day 10</div>
+          <div>If the employee declines to take action, or gives no decision by the end of the 10th federal working day, you <strong>close the case</strong>; E-Verify cannot confirm work authorization and employment may be terminated.</div>
+        </div>
+        <div class="tl-item green">
+          <div class="when">After referral — EMPLOYEE has 8 federal working days</div>
+          <div>Once you refer the case, the employee has <strong>8 federal working days</strong> to <strong>visit SSA</strong> (SSA mismatch) or <strong>call DHS</strong> (DHS mismatch) to resolve it. They keep working throughout.</div>
+        </div>
+        <div class="tl-item">
+          <div class="when">Resolution</div>
+          <div>E-Verify updates to <strong>Employment Authorized</strong>, <strong>Case in Continuance</strong> (more time), or <strong>Final Nonconfirmation</strong>. Act per the result; always <strong>close</strong> the case with the correct closure reason.</div>
+        </div>
+      </div>
+
+      <div class="callout c-law">
+        <div class="ttl">§ "Federal working days"</div>
+        <p>Both clocks count <strong>federal government working days</strong> — Monday–Friday excluding federal holidays. Don't count weekends or holidays. The 10-day employer clock starts when E-Verify issues the mismatch; the 8-day employee clock starts at referral.</p>
+      </div>
+
+      <h3>How to deliver a mismatch the right way</h3>
+      <div class="ddgrid">
+        <div class="ddcol do">
+          <h4>✓ Do</h4>
+          <ul>
+            <li>Tell the employee <strong>privately</strong> and promptly.</li>
+            <li>Explain it's a data mismatch, not an accusation, and that they may contest.</li>
+            <li>Give the FAN in a language/format they can understand; offer it in Spanish if appropriate.</li>
+            <li>Keep them working and paid normally throughout.</li>
+            <li>Document each step and date in the case/notes.</li>
+          </ul>
+        </div>
+        <div class="ddcol dont">
+          <h4>✕ Don't</h4>
+          <ul>
+            <li>Announce it in front of coworkers.</li>
+            <li>Tell them to "fix their papers or you're gone."</li>
+            <li>Suspend, cut hours, withhold pay, or delay training.</li>
+            <li>Refer the case without their decision and signature.</li>
+            <li>Let either clock lapse silently.</li>
+          </ul>
+        </div>
+      </div>
+
+      <details>
+        <summary>Deep dive: closing cases &amp; choosing a closure reason</summary>
+        <div class="body">
+          <p>Every E-Verify case must eventually be <strong>closed</strong> with an accurate reason — e.g., employment authorized; the employee was terminated for a reason unrelated to E-Verify; the case was created in error; the employee did not contest; or final nonconfirmation. The closure reason is part of your audit trail. If you created a duplicate or made a data error, use <strong>Close Case and Resubmit</strong> and open a corrected case rather than editing around it.</p>
+          <p><strong>If you terminate</strong> after a Final Nonconfirmation, record that the termination was based on the FNC and close accordingly. If you choose to <strong>keep employing</strong> someone after an FNC, E-Verify requires you to notify DHS — follow the prompt; this is unusual and should involve Legal.</p>
+        </div>
+      </details>
+
+      <div class="scenario">
+        <div class="lbl">Scenario</div>
+        <p>Maria starts Monday. You open her case Tuesday; it returns an <strong>SSA mismatch</strong>. You realize she recently married and changed her name with you but maybe not with SSA. What's the right sequence?</p>
+        <details>
+          <summary>Show the recommended handling</summary>
+          <div class="body">
+            <ol>
+              <li>First, <strong>verify your data entry</strong> against her documents. If you mistyped her name/SSN, use <strong>Close Case and Resubmit</strong> with corrected data — that may clear it with no mismatch at all.</li>
+              <li>If your data is correct, treat it as a genuine mismatch: notify Maria <strong>privately</strong>, give and review the <strong>FAN</strong>, and let her decide.</li>
+              <li>If she chooses to take action, <strong>refer</strong> the case and give her the Referral Date Confirmation. She has <strong>8 federal working days</strong> to visit <strong>SSA</strong> (likely to update her name).</li>
+              <li>She keeps working and is paid normally. You take no adverse action and wait for E-Verify to update.</li>
+            </ol>
+          </div>
+        </details>
+      </div>
+
+      <div class="kc" data-answer="2">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">An employee receives a mismatch and chooses to contest it. While the case is open, the employee may be:</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Suspended without pay until it resolves.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Moved to reduced hours "to limit risk."</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Kept working and paid normally — no adverse action is allowed while contesting.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: C.</b> While a mismatch is being contested, the employee continues working under normal terms. Suspension, reduced hours, or withholding pay are prohibited adverse actions.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 11 ===================== -->
+    <section class="module" id="m11">
+      <h2><span class="num">11</span> Anti-discrimination &amp; employee rights (DOJ–IER)</h2>
+      <p class="lead">The same law that requires verification forbids using it to discriminate. People Services sits exactly on this line.</p>
+
+      <h3>What the INA prohibits</h3>
+      <ul>
+        <li><strong>Citizenship-status discrimination</strong> — treating people differently in hiring, firing, or verification because they are/aren't citizens, permanent residents, refugees, asylees, etc.</li>
+        <li><strong>National-origin discrimination</strong> — based on country of origin, accent, name, or appearance.</li>
+        <li><strong>Unfair documentary practices ("document abuse")</strong> — demanding specific documents, more than required, or rejecting valid ones, based on a person's status or origin.</li>
+        <li><strong>Retaliation</strong> — punishing someone for asserting their rights or filing a complaint.</li>
+      </ul>
+
+      <div class="ddgrid">
+        <div class="ddcol do">
+          <h4>✓ Do</h4>
+          <ul>
+            <li>Let the employee choose which acceptable document(s) to present.</li>
+            <li>Apply identical procedures to every new hire.</li>
+            <li>Accept any document that's on the Lists, unexpired, and reasonably genuine.</li>
+            <li>Offer the remote procedure consistently if you offer it at all.</li>
+          </ul>
+        </div>
+        <div class="ddcol dont">
+          <h4>✕ Don't</h4>
+          <ul>
+            <li>Say "I need your green card / passport specifically."</li>
+            <li>Ask non-citizens for "extra proof."</li>
+            <li>Re-verify people who don't require it (citizens, LPRs).</li>
+            <li>Run E-Verify only on certain groups.</li>
+            <li>Set work-authorization expiration as a hiring filter.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout c-law">
+        <div class="ttl">§ "Future expiration date" is not a hiring factor</div>
+        <p>You may not refuse to hire, or treat differently, someone whose work authorization has a future expiration date. A temporary EAD is just as valid for I-9 purposes as a passport on the day it's presented. Reverify later if required — don't discriminate now.</p>
+      </div>
+
+      <div class="kc" data-answer="0">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">Two new hires present valid documents. One has an EAD expiring in 14 months; the other a U.S. passport. A manager says "let's not bother with the EAD person — too much hassle later." Your response?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Both are equally authorized today; treating the EAD holder worse because of a future expiration is unlawful citizenship-status discrimination.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Agree — fewer renewals is simpler.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Ask the EAD holder for a second document to be safe.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: A.</b> A future expiration date can't drive an employment decision, and asking for extra documents is document abuse. Reverify later only if/when required.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 12 ===================== -->
+    <section class="module" id="m12">
+      <h2><span class="num">12</span> Retention, storage &amp; government audits</h2>
+      <p class="lead">Completing the I-9 is half the job; keeping it correctly and producing it on demand is the other half.</p>
+
+      <h3>The retention formula</h3>
+      <div class="callout c-law">
+        <div class="ttl">§ Keep each I-9 for the LATER of:</div>
+        <p><strong>3 years after the date of hire</strong> &nbsp;—or—&nbsp; <strong>1 year after the date employment ends</strong>, whichever is <strong>later</strong>. Compute the date when someone leaves and purge only when both conditions are satisfied.</p>
+      </div>
+      <p class="footnote">Quick method at termination: (a) hire date + 3 years; (b) termination date + 1 year; keep until the later date.</p>
+
+      <h3>Storage best practices</h3>
+      <ul>
+        <li><strong>Store I-9s separately</strong> from general personnel files (so an auditor sees only I-9s, not unrelated records).</li>
+        <li>If you keep <strong>copies of documents</strong>, do it <strong>consistently for everyone</strong> — copying for some and not others can look discriminatory.</li>
+        <li><strong>Electronic storage (Workday/partner)</strong> must protect integrity, prevent unauthorized changes, keep an <strong>audit trail</strong>, and reproduce legible copies on request.</li>
+        <li>Maintain a <strong>purge schedule</strong> so you don't keep records past their retention requirement.</li>
+      </ul>
+
+      <h3>Government inspections</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Who</th><th>Trigger</th><th>Notice</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ICE / HSI</strong></td><td>Worksite enforcement / audit</td><td><strong>Notice of Inspection (NOI)</strong> — typically <strong>3 business days</strong> to produce I-9s.</td></tr>
+            <tr><td><strong>DOJ – IER</strong></td><td>Discrimination investigation</td><td>Request for documents.</td></tr>
+            <tr><td><strong>DOL</strong></td><td>Wage/hour &amp; other investigations</td><td>May review I-9s as part of a broader audit.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout c-tip">
+        <div class="ttl">🎯 Self-audit periodically</div>
+        <p>Run internal I-9 audits to find and correct errors <em>before</em> the government does. Do it consistently and neutrally (not targeting individuals), correct properly (Module 13), and document your methodology. A clean, well-documented self-audit program is strong evidence of good faith.</p>
+      </div>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday</div>
+        <p>Use I-9 reporting to monitor <strong>missing/incomplete forms</strong>, <strong>upcoming reverifications</strong>, <strong>open E-Verify cases</strong>, and <strong>retention/purge dates</strong>. Confirm your tenant can export the I-9 and uploaded document images for an auditor on short notice. <em>Identify the standard report names in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">An employee hired on Jan 1, 2022 leaves on Jan 1, 2026. When can their I-9 be purged?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Jan 1, 2025 (hire + 3 years).</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Jan 1, 2027 (termination + 1 year), because that's later than hire + 3 years.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Immediately upon termination.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> Hire + 3 years = Jan 1, 2025; termination + 1 year = Jan 1, 2027. Keep until the <b>later</b> date — Jan 1, 2027.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 13 ===================== -->
+    <section class="module" id="m13">
+      <h2><span class="num">13</span> Corrections &amp; the most common errors</h2>
+      <p class="lead">Mistakes happen. How you correct them matters as much as the original entry.</p>
+
+      <h3>Golden rules of correcting a paper I-9</h3>
+      <ul>
+        <li><strong>Never erase, white-out, or obscure</strong> the original entry.</li>
+        <li>Draw a <strong>single line</strong> through the error, enter the correct information, and add your <strong>initials and the date</strong> of the correction.</li>
+        <li><strong>Section 1 errors</strong> should be corrected by the <strong>employee</strong>; <strong>Section 2 errors</strong> by the <strong>employer</strong>. Don't fix the other party's section.</li>
+        <li>If a form is <strong>missing</strong>, complete a new one <strong>now</strong> using the current date — don't backdate. Attach a brief signed memo explaining why it's late.</li>
+        <li>Don't create a brand-new form to hide an error on the old one; correct transparently and keep both if a new form is warranted.</li>
+      </ul>
+
+      <div class="callout c-workday">
+        <div class="ttl">💻 In Workday / electronic systems</div>
+        <p>Electronic I-9s are corrected through the system's <strong>amendment/correction workflow</strong>, which preserves the prior values in an <strong>audit trail</strong> (the electronic equivalent of "line-through-initial-date"). Don't try to overwrite history. For employee-side (Section 1) corrections, route the task back to the employee. <em>Confirm the correction/amendment path in <code>[your tenant]</code>.</em></p>
+      </div>
+
+      <h3>Top recurring errors (catch these)</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Error</th><th>Why it matters</th><th>Fix</th></tr></thead>
+          <tbody>
+            <tr><td>Missing signature/date (either section)</td><td>An unsigned attestation is a substantive defect.</td><td>Have the correct party sign &amp; date now; note the late date.</td></tr>
+            <tr><td>Section 2 completed late</td><td>Misses the 3-business-day rule.</td><td>Complete immediately, real date; consider a brief memo.</td></tr>
+            <tr><td>Wrong/old form edition</td><td>Form may be invalid.</td><td>Use the current edition; redo if instructed by policy/Legal.</td></tr>
+            <tr><td>Both List A and List B+C filled</td><td>Implies over-documentation.</td><td>Keep the correct path; line-through the extra (paper) / amend (electronic).</td></tr>
+            <tr><td>Reverification missed</td><td>Employing past expiration risks unauthorized work.</td><td>Reverify immediately on Supplement B; tighten ticklers.</td></tr>
+            <tr><td>SSN/DOB/name typo before E-Verify</td><td>Causes avoidable mismatches.</td><td>Verify against documents before submitting the case.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="kc" data-answer="2">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">You spot a wrong document number you typed in Section 2 last week (paper form). How do you fix it?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>White it out and write the correct number.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Have the employee correct it.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Single line through the error, write the correct number, and add your initials + today's date.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: C.</b> Never white-out. Section 2 is the employer's section, so <b>you</b> correct it: line-through, correct value, your initials and date. Electronic systems do this via the amendment workflow.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 14 ===================== -->
+    <section class="module" id="m14">
+      <h2><span class="num">14</span> Penalties &amp; enforcement</h2>
+      <p class="lead">Why precision pays off — the cost of getting it wrong, at scale.</p>
+
+      <div class="callout c-warn">
+        <div class="ttl">⚠ Penalty amounts change every year</div>
+        <p>Federal civil penalties are <strong>adjusted for inflation annually</strong>. Treat the figures below as <em>orders of magnitude</em> only and confirm current amounts (8 CFR 274a.10 and the DHS Federal Register adjustments) before quoting anyone.</p>
+      </div>
+
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Violation</th><th>Nature</th><th>Approx. exposure (per violation/worker — verify current)</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Paperwork / substantive I-9 violations</strong></td><td>Civil</td><td>Hundreds to a few thousand dollars <strong>per form</strong> — multiplied across a workforce, this adds up fast.</td></tr>
+            <tr><td><strong>Knowingly hiring / continuing to employ</strong> unauthorized workers</td><td>Civil (escalates by offense #)</td><td>Roughly hundreds to tens of thousands of dollars <strong>per worker</strong>, rising sharply for repeat offenses.</td></tr>
+            <tr><td><strong>Unfair documentary practices / discrimination</strong> (IER)</td><td>Civil + back pay</td><td>Per-individual penalties plus possible back pay and corrective orders.</td></tr>
+            <tr><td><strong>Pattern or practice / fraud</strong></td><td>Criminal</td><td>Fines and potential imprisonment; debarment from federal contracts.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Beyond fines</h3>
+      <ul>
+        <li><strong>Debarment</strong> from federal contracts for serious violations.</li>
+        <li><strong>E-Verify MOU termination</strong> for misuse (e.g., pre-screening, selective verification, adverse action during mismatches).</li>
+        <li><strong>Reputational</strong> harm and operational disruption from a worksite enforcement action.</li>
+      </ul>
+
+      <div class="callout c-tip">
+        <div class="ttl">🎯 "Good faith" is a real defense</div>
+        <p>For many technical/procedural paperwork errors, a documented <strong>good-faith</strong> compliance program, timely corrections, and consistent self-audits can reduce or avoid penalties. Your careful, consistent processing <em>is</em> the company's defense.</p>
+      </div>
+
+      <div class="kc" data-answer="1">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">Which best reflects how I-9 paperwork penalties scale?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>One flat fine no matter how many forms have errors.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Per-form/per-worker, so small error rates across many hires create large total exposure — and amounts are adjusted annually.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Only criminal penalties exist.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: B.</b> Civil penalties are assessed per form/worker and are inflation-adjusted each year, so consistent accuracy across volume is what protects the organization.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== MODULE 15 ===================== -->
+    <section class="module" id="m15">
+      <h2><span class="num">15</span> Special situations you'll actually encounter</h2>
+      <p class="lead">The edge cases that generate most of your questions. Confirm specifics with Legal where noted.</p>
+
+      <details open>
+        <summary>Remote &amp; hybrid hires (the alternative procedure)</summary>
+        <div class="body">
+          <p>If your organization is an <strong>E-Verify employer in good standing</strong>, you may verify documents remotely: have the employee send <strong>front/back copies</strong>, conduct a <strong>live video interaction</strong> while they hold the originals, confirm the documents reasonably appear genuine and relate to them, <strong>check the alternative-procedure box</strong> on the I-9, and <strong>retain the copies</strong>. Create the E-Verify case as usual. Offer the procedure <strong>consistently</strong> at a site (don't single people out). If you're not an E-Verify employer in good standing, you must do a <strong>physical, in-person</strong> exam (an authorized representative may do it on your behalf — that representative acts for the employer, so train them).</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>New hire has applied for but not received an SSN</summary>
+        <div class="body">
+          <p>Complete the I-9 (Section 1 can note the SSN is pending). Because E-Verify needs the SSN, <strong>delay creating the case</strong> until the SSN arrives, then create it and record the reason for the delay. Don't withhold employment or treat the person adversely for a pending SSN.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>F-1 students: OPT, STEM OPT, CPT</summary>
+        <div class="body">
+          <p>Typically present an <strong>EAD (I-766)</strong> for OPT (List A), or for CPT a combination tied to the I-20/I-94. <strong>STEM OPT</strong> has specific extension rules. Track the work-auth expiration for reverification. The details are nuanced — when unsure, confirm with your immigration counsel rather than guessing.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>EAD auto-extensions &amp; the 180-day rule</summary>
+        <div class="body">
+          <p>Certain EAD categories are <strong>automatically extended</strong> when a timely renewal is filed — historically up to 180 days, with longer temporary extensions announced at times. The combination of the expiring EAD plus the receipt notice can establish continued authorization for the extension window. Note the facts and the auto-extension end date in the Additional Information box and reverify at the right time. <strong>Verify the current auto-extension length</strong> in USCIS guidance — it has changed.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>TPS (Temporary Protected Status)</summary>
+        <div class="body">
+          <p>TPS beneficiaries often have EADs that may be auto-extended by Federal Register notice. Follow the specific notice for the country/designation in effect and document the extension basis. Confirm against the current notice — these change with each redesignation/extension.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Rehires &amp; name changes</summary>
+        <div class="body">
+          <p><strong>Rehire within 3 years:</strong> you may use Supplement B on the prior I-9 (if still valid and on current rules), reverifying if authorization changed. Many orgs prefer a fresh I-9 — follow policy. <strong>Name change:</strong> record in Supplement B; documentation isn't required but noting the basis is good practice.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Lawful permanent residents (never reverify)</summary>
+        <div class="body">
+          <p>An LPR who presented a green card for List A is <strong>not</strong> reverified, even when the card expires. The card expiring doesn't end their work authorization. Asking for a renewed card is over-verification.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Mergers, acquisitions &amp; authorized representatives</summary>
+        <div class="body">
+          <p>In an <strong>M&amp;A</strong>, the successor can either treat acquired staff as new hires (new I-9s) or adopt the predecessor's I-9s (inheriting any defects) — a decision for Legal. An <strong>authorized representative</strong> (e.g., a notary, manager, or third party) may complete Section 2 on the employer's behalf for remote in-person exams; the employer remains liable for their errors, so provide instructions.</p>
+        </div>
+      </details>
+
+      <div class="kc" data-answer="0">
+        <div class="tag">Knowledge check</div>
+        <p class="kc-q">A fully remote new hire can't come to an office. Your company is an E-Verify employer in good standing. What's the cleanest compliant path?</p>
+        <div class="kc-options">
+          <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Use the DHS remote alternative procedure: copies + live video, check the box, retain copies, create the E-Verify case — offered consistently.</span></button>
+          <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Have them email document photos and skip the video.</span></button>
+          <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Wait until they can travel to an office someday.</span></button>
+        </div>
+        <div class="kc-explain"><b>Answer: A.</b> The live video interaction, retained copies, and checking the alternative-procedure box are required elements — and you must offer it consistently. Photos alone (no video) don't satisfy the procedure.</div>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== QUICK REFERENCE ===================== -->
+    <section class="module" id="ref">
+      <h2><span class="num">QR</span> Quick reference</h2>
+      <p class="lead">Pin this. The five things you'll look up most.</p>
+
+      <h3>① Deadline cheat-sheet</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Task</th><th>Deadline</th><th>Clock starts</th></tr></thead>
+          <tbody>
+            <tr><td>Section 1 (employee)</td><td>By end of <strong>first day</strong> of work</td><td>First paid day</td></tr>
+            <tr><td>Section 2 (you)</td><td>Within <strong>3 business days</strong></td><td>First paid day (start date)</td></tr>
+            <tr><td>Create E-Verify case</td><td>Within <strong>3 business days</strong></td><td>First paid day (start date)</td></tr>
+            <tr><td>Employer mismatch steps + referral</td><td>Within <strong>10 federal working days</strong></td><td>When mismatch issued</td></tr>
+            <tr><td>Employee resolves at SSA/DHS</td><td>Within <strong>8 federal working days</strong></td><td>When you refer the case</td></tr>
+            <tr><td>Reverification (Supp. B)</td><td>On/before <strong>expiration</strong></td><td>Work-auth expiration date</td></tr>
+            <tr><td>Retain I-9</td><td><strong>Later of</strong> 3 yrs after hire / 1 yr after term</td><td>Hire &amp; termination dates</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>② Document pocket guide</h3>
+      <p><strong>A — or — B + C.</strong> One List A (identity + work auth) <em>or</em> one List B (identity) plus one List C (work auth). Employee chooses. Unexpired + original + reasonably genuine. Never demand a specific or extra document.</p>
+
+      <h3>③ Mismatch flow (one line)</h3>
+      <p>Mismatch → verify your data (resubmit if you erred) → notify privately + review FAN → employee decides (sign) → if contesting, <strong>refer</strong> within 10 fed days → employee has <strong>8 fed days</strong> at SSA/DHS → keep them working/paid → act on result → <strong>close</strong> the case with the right reason.</p>
+
+      <h3>④ Never do this</h3>
+      <ul>
+        <li>Pre-screen with E-Verify or documents before hire/start.</li>
+        <li>Demand specific or extra documents; reject valid ones.</li>
+        <li>Reverify citizens or LPRs.</li>
+        <li>Take adverse action during an open/contested case.</li>
+        <li>Backdate forms or cases; white-out errors.</li>
+      </ul>
+
+      <h3>⑤ When to escalate to Legal/Lead</h3>
+      <ul>
+        <li>A document looks altered or you're unsure it's genuine.</li>
+        <li>Final Nonconfirmation, or you're considering keeping someone after an FNC.</li>
+        <li>Complex statuses (STEM OPT, TPS extensions, M&amp;A, authorized-representative setups).</li>
+        <li>Any discrimination concern or employee complaint.</li>
+      </ul>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== GLOSSARY ===================== -->
+    <section class="module" id="glossary">
+      <h2><span class="num">G</span> Glossary</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><strong>A-Number / USCIS Number</strong></td><td>The unique identifier assigned to noncitizens (e.g., on a green card or EAD).</td></tr>
+            <tr><td><strong>EAD (Form I-766)</strong></td><td>Employment Authorization Document — a List A document with photo.</td></tr>
+            <tr><td><strong>FAN</strong></td><td>Further Action Notice — the document explaining a mismatch and how to resolve it.</td></tr>
+            <tr><td><strong>FAR E-Verify clause</strong></td><td>Federal Acquisition Regulation requirement that obligates many federal contractors to use E-Verify.</td></tr>
+            <tr><td><strong>FNC</strong></td><td>Final Nonconfirmation — E-Verify could not confirm authorization after the process.</td></tr>
+            <tr><td><strong>I-94</strong></td><td>Arrival/Departure Record showing a noncitizen's admission/status.</td></tr>
+            <tr><td><strong>I-551</strong></td><td>Permanent Resident Card ("green card"); also the temporary I-551 stamp.</td></tr>
+            <tr><td><strong>IER</strong></td><td>DOJ's Immigrant and Employee Rights Section — enforces anti-discrimination rules.</td></tr>
+            <tr><td><strong>IRCA / INA §274A</strong></td><td>The 1986 law (and INA section) creating the I-9 requirement.</td></tr>
+            <tr><td><strong>LPR</strong></td><td>Lawful Permanent Resident — not reverified for I-9 purposes.</td></tr>
+            <tr><td><strong>Mismatch / TNC</strong></td><td>Tentative Nonconfirmation — E-Verify data didn't match; the employee may contest.</td></tr>
+            <tr><td><strong>MOU</strong></td><td>Memorandum of Understanding governing E-Verify participation.</td></tr>
+            <tr><td><strong>NOI</strong></td><td>Notice of Inspection — ICE's demand to produce I-9s (often 3 business days).</td></tr>
+            <tr><td><strong>Referral Date Confirmation</strong></td><td>The notice you give an employee after referring a contested case, with their resolution deadline.</td></tr>
+            <tr><td><strong>Reverification</strong></td><td>Re-confirming work authorization that has expired, via Supplement B.</td></tr>
+            <tr><td><strong>Supplement A / B</strong></td><td>Preparer/Translator (A) and Reverification/Rehire (B) — replace the old Section 3.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== CHECKLIST ===================== -->
+    <section class="module" id="checklist">
+      <h2><span class="num">✓</span> People Services processing checklist</h2>
+      <p class="lead">A repeatable per-hire workflow. Ticks save in this browser so you can use it live. (Reset clears them.)</p>
+
+      <h3>For every new hire</h3>
+      <ul class="checklist">
+        <li><input type="checkbox" id="ck1" data-persist><label for="ck1">Confirmed the accurate <strong>first day of employment</strong> (start date) — every clock keys off it.</label></li>
+        <li><input type="checkbox" id="ck2" data-persist><label for="ck2">Verified <strong>Section 1</strong> is complete, signed, dated, exactly one status box, required numbers present, on time.</label></li>
+        <li><input type="checkbox" id="ck3" data-persist><label for="ck3">Confirmed <strong>Supplement A</strong> completed if anyone assisted/translated.</label></li>
+        <li><input type="checkbox" id="ck4" data-persist><label for="ck4">Examined documents (in person or via the <strong>remote alternative procedure</strong>) — unexpired, original, reasonably genuine, A or B+C, employee's choice.</label></li>
+        <li><input type="checkbox" id="ck5" data-persist><label for="ck5">Completed <strong>Section 2</strong> within <strong>3 business days</strong>: correct List columns, title/authority/number/expiration, my signature/title/date, alternative-procedure box if used.</label></li>
+        <li><input type="checkbox" id="ck6" data-persist><label for="ck6">Verified <strong>name, DOB, SSN, status</strong> against documents before opening the case (prevents avoidable mismatches).</label></li>
+        <li><input type="checkbox" id="ck7" data-persist><label for="ck7">Created the <strong>E-Verify case</strong> within <strong>3 business days</strong>; handled <strong>photo matching</strong> and duplicate alerts.</label></li>
+        <li><input type="checkbox" id="ck8" data-persist><label for="ck8">Recorded the <strong>result</strong> and acted on it; on a mismatch, ran the FAN/referral process and took <strong>no adverse action</strong>.</label></li>
+        <li><input type="checkbox" id="ck9" data-persist><label for="ck9"><strong>Closed</strong> the case with the correct closure reason.</label></li>
+        <li><input type="checkbox" id="ck10" data-persist><label for="ck10">Set a <strong>reverification tickler</strong> if work authorization has an expiration date.</label></li>
+        <li><input type="checkbox" id="ck11" data-persist><label for="ck11">Stored the I-9/images correctly and recorded the <strong>retention/purge</strong> date logic.</label></li>
+      </ul>
+      <button class="btn-ghost no-print" id="resetChecklist">Reset checklist</button>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== QUIZ ===================== -->
+    <section class="module" id="quiz">
+      <div class="quiz-head">
+        <h3>★ Final certification quiz</h3>
+        <p style="margin:0;color:#dbe8f6">15 questions. Select an answer for each, then submit to see your score and explanations. Aim for 80%+ (12/15).</p>
+      </div>
+
+      <div id="final-quiz">
+        <div class="kc quiz-item" data-answer="1">
+          <p class="kc-q">1. By when must Section 2 normally be completed?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Within 3 business days of receiving documents.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Within 3 business days of the employee's first day of work.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Within 3 calendar days of the offer letter.</span></button>
+          </div>
+          <div class="kc-explain"><b>B.</b> The clock runs from the first day of employment, in business days.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="2">
+          <p class="kc-q">2. An employee may satisfy the documentary requirement with:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Two List B documents.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>One List C document alone.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>One List A, OR one List B plus one List C.</span></button>
+          </div>
+          <div class="kc-explain"><b>C.</b> A — or — B + C. Nothing else.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="0">
+          <p class="kc-q">3. A new hire offers a valid driver's license and unrestricted SS card, but you'd rather see a passport. You should:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Accept the B+C combination — the choice is the employee's.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Require the passport instead.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Require all three.</span></button>
+          </div>
+          <div class="kc-explain"><b>A.</b> Demanding a specific or extra document is document abuse.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="1">
+          <p class="kc-q">4. The current Form I-9 edition referenced in this training is:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>10/21/2019.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>01/20/2025 (08/01/2023 also accepted) — confirm the live edition.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>There is only ever one edition.</span></button>
+          </div>
+          <div class="kc-explain"><b>B.</b> 01/20/2025 is current; 08/01/2023 remains acceptable through 05/31/2027. Always confirm at uscis.gov/i-9.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="2">
+          <p class="kc-q">5. You must create the E-Verify case:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Before the candidate accepts the offer.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Only if you're unsure about the person.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Within 3 business days of the start date, for every new hire at a participating site.</span></button>
+          </div>
+          <div class="kc-explain"><b>C.</b> No pre-screening, no selective use, 3-business-day deadline.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="0">
+          <p class="kc-q">6. After E-Verify issues a mismatch, the employer must notify the employee and complete the referral process within:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>10 federal working days.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>3 calendar days.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>30 days.</span></button>
+          </div>
+          <div class="kc-explain"><b>A.</b> 10 federal working days for the employer side; the employee then has 8 after referral.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="1">
+          <p class="kc-q">7. Once you refer a contested case, the employee has how long to contact SSA/DHS?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>24 hours.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>8 federal working days.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>No deadline.</span></button>
+          </div>
+          <div class="kc-explain"><b>B.</b> 8 federal working days from referral.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="2">
+          <p class="kc-q">8. While an employee is contesting a mismatch, you may:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Suspend them without pay.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Cut their hours.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Take no adverse action — they keep working and are paid normally.</span></button>
+          </div>
+          <div class="kc-explain"><b>C.</b> No adverse action during an open/contested case.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="0">
+          <p class="kc-q">9. Which employee is NOT reverified?</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>A lawful permanent resident whose green card is expiring.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>An EAD holder whose work authorization expires.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>A noncitizen with a temporary work-auth expiration date.</span></button>
+          </div>
+          <div class="kc-explain"><b>A.</b> LPRs are never reverified, even when the card expires.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="1">
+          <p class="kc-q">10. Retention rule for a completed I-9:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>1 year after hire.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>The later of 3 years after hire OR 1 year after termination.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Forever.</span></button>
+          </div>
+          <div class="kc-explain"><b>B.</b> Keep until the later of those two dates, then purge.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="2">
+          <p class="kc-q">11. The correct way to fix a Section 2 typo on a paper form:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>White-out and rewrite.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Have the employee correct it.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Single line-through, correct value, your initials + date.</span></button>
+          </div>
+          <div class="kc-explain"><b>C.</b> Never white-out; Section 2 is the employer's to correct.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="0">
+          <p class="kc-q">12. The remote alternative procedure requires:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>E-Verify good standing, copies, a live video interaction, checking the box, and retaining copies — offered consistently.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Just emailed photos of documents.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>A notarized affidavit only.</span></button>
+          </div>
+          <div class="kc-explain"><b>A.</b> Live video + retained copies + the box + consistency are all required.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="1">
+          <p class="kc-q">13. For an E-Verify employer, the SSN field on the I-9 is:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Always optional.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Required (E-Verify checks SSA records).</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Only required for non-citizens.</span></button>
+          </div>
+          <div class="kc-explain"><b>B.</b> E-Verify needs the SSN; if pending, complete the I-9 and delay the case until it arrives.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="2">
+          <p class="kc-q">14. Photo matching applies when the employee presents:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>A Social Security card.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>A birth certificate.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>A U.S. Passport/Passport Card, Permanent Resident Card, or EAD.</span></button>
+          </div>
+          <div class="kc-explain"><b>C.</b> Those three trigger photo matching against the E-Verify-displayed image.</div>
+        </div>
+
+        <div class="kc quiz-item" data-answer="0">
+          <p class="kc-q">15. A manager asks you to run E-Verify only on employees with "foreign-sounding names." You:</p>
+          <div class="kc-options">
+            <button class="kc-opt" data-idx="0"><span class="mk">A</span><span>Refuse — selective verification by national origin is discrimination and violates the MOU; verify all new hires.</span></button>
+            <button class="kc-opt" data-idx="1"><span class="mk">B</span><span>Comply quietly.</span></button>
+            <button class="kc-opt" data-idx="2"><span class="mk">C</span><span>Run them and also ask for extra documents.</span></button>
+          </div>
+          <div class="kc-explain"><b>A.</b> Selective verification and document abuse are unlawful; escalate the request.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px">
+        <button class="btn-primary no-print" id="quiz-submit">Submit quiz &amp; score</button>
+        <button class="btn-ghost no-print" id="quiz-reset">Reset answers</button>
+      </div>
+      <div id="quiz-result"></div>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+    <!-- ===================== RESOURCES ===================== -->
+    <section class="module" id="resources">
+      <h2><span class="num">↗</span> Official resources &amp; sources</h2>
+      <p class="lead">Bookmark these. When this guide and an official source disagree, the official source wins — and tell the training owner so this file gets updated.</p>
+      <ul>
+        <li><strong>Form I-9 &amp; instructions:</strong> <a href="https://www.uscis.gov/i-9" target="_blank" rel="noopener">uscis.gov/i-9</a></li>
+        <li><strong>I-9 Central &amp; M-274 Handbook for Employers:</strong> <a href="https://www.uscis.gov/i-9-central" target="_blank" rel="noopener">uscis.gov/i-9-central</a></li>
+        <li><strong>Remote document examination (alternative procedure):</strong> <a href="https://www.uscis.gov/i-9-central/remote-examination-of-documents" target="_blank" rel="noopener">uscis.gov/i-9-central/remote-examination-of-documents</a></li>
+        <li><strong>E-Verify (employers, process, manuals):</strong> <a href="https://www.e-verify.gov" target="_blank" rel="noopener">e-verify.gov</a></li>
+        <li><strong>Mismatch (TNC) process:</strong> <a href="https://www.e-verify.gov/employers/verification-process/tentative-nonconfirmations-mismatches" target="_blank" rel="noopener">e-verify.gov — Tentative Nonconfirmations (Mismatches)</a></li>
+        <li><strong>Anti-discrimination (DOJ–IER):</strong> <a href="https://www.justice.gov/crt/immigrant-and-employee-rights-section" target="_blank" rel="noopener">justice.gov — IER</a></li>
+        <li><strong>Your tenant's I-9/E-Verify business process documentation:</strong> <code>[link for your tenant]</code></li>
+      </ul>
+
+      <div class="callout c-tip">
+        <div class="ttl">🎯 Before you roll this out</div>
+        <p>Replace every <code>[your tenant]</code> placeholder with your real task names, screenshots, and SSO links; confirm whether you're on native Workday E-Verify or a partner; have Legal/Compliance review the federal summaries against the current sources; and re-check the Form I-9 edition and any penalty/auto-extension figures, which change over time.</p>
+      </div>
+
+      <hr class="soft">
+      <p class="footnote">Sources consulted for the federal content in this guide (verify current versions): USCIS — <a href="https://www.uscis.gov/i-9" target="_blank" rel="noopener">I-9</a> &amp; <a href="https://www.uscis.gov/i-9-central/remote-examination-of-documents" target="_blank" rel="noopener">Remote Examination of Documents</a>; E-Verify — <a href="https://www.e-verify.gov/employers/verification-process/tentative-nonconfirmations-mismatches" target="_blank" rel="noopener">Tentative Nonconfirmations (Mismatches)</a> and <a href="https://www.e-verify.gov/about-e-verify/whats-new/reminder-employer-action-required-on-tentative-nonconfirmations-0" target="_blank" rel="noopener">10-day employer-action reminder</a>.</p>
+      <p class="footnote">Training guide v1.0 · reflects federal rules as of June 2026 · Form I-9 edition 01/20/2025. For internal People Services training only — not legal advice.</p>
+      <a class="anchor-top" href="#start">↑ Back to top</a>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- progress bar ----
+  var bar = document.getElementById('progress-bar');
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // ---- scrollspy ----
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var map = {};
+  navLinks.forEach(function(a){
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if(el) map[id] = a;
+  });
+  if('IntersectionObserver' in window){
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          navLinks.forEach(function(a){a.classList.remove('active');});
+          var a = map[en.target.id];
+          if(a) a.classList.add('active');
+        }
+      });
+    }, {rootMargin:'-15% 0px -75% 0px', threshold:0});
+    Object.keys(map).forEach(function(id){ obs.observe(document.getElementById(id)); });
+  }
+
+  // ---- knowledge checks (inline) + quiz items ----
+  document.addEventListener('click', function(e){
+    var opt = e.target.closest ? e.target.closest('.kc-opt') : null;
+    if(!opt) return;
+    var kc = opt.closest('.kc');
+    if(!kc) return;
+    var isQuiz = kc.classList.contains('quiz-item');
+
+    if(isQuiz){
+      // just select; allow changing until submit
+      kc.querySelectorAll('.kc-opt').forEach(function(o){o.classList.remove('selected');});
+      opt.classList.add('selected');
+      return;
+    }
+    // inline: lock after first answer
+    if(kc.getAttribute('data-answered')) return;
+    kc.setAttribute('data-answered','1');
+    var ans = parseInt(kc.getAttribute('data-answer'),10);
+    kc.querySelectorAll('.kc-opt').forEach(function(o){
+      var idx = parseInt(o.getAttribute('data-idx'),10);
+      if(idx === ans) o.classList.add('correct');
+    });
+    opt.classList.add('selected');
+    if(parseInt(opt.getAttribute('data-idx'),10) !== ans) opt.classList.add('incorrect');
+    var ex = kc.querySelector('.kc-explain');
+    if(ex) ex.classList.add('show');
+  });
+
+  // ---- final quiz scoring ----
+  var submit = document.getElementById('quiz-submit');
+  var result = document.getElementById('quiz-result');
+  if(submit){
+    submit.addEventListener('click', function(){
+      var items = Array.prototype.slice.call(document.querySelectorAll('#final-quiz .quiz-item'));
+      var correct = 0, answered = 0;
+      items.forEach(function(kc){
+        var ans = parseInt(kc.getAttribute('data-answer'),10);
+        var sel = kc.querySelector('.kc-opt.selected');
+        kc.querySelectorAll('.kc-opt').forEach(function(o){
+          o.classList.remove('correct','incorrect');
+          var idx = parseInt(o.getAttribute('data-idx'),10);
+          if(idx === ans) o.classList.add('correct');
+          if(o === sel && idx !== ans) o.classList.add('incorrect');
+        });
+        var ex = kc.querySelector('.kc-explain');
+        if(ex) ex.classList.add('show');
+        if(sel){ answered++; if(parseInt(sel.getAttribute('data-idx'),10) === ans) correct++; }
+      });
+      var total = items.length;
+      var pct = Math.round((correct/total)*100);
+      var pass = pct >= 80;
+      result.style.background = pass ? 'var(--green-soft)' : 'var(--amber-soft)';
+      result.style.color = pass ? 'var(--green)' : 'var(--amber)';
+      result.style.border = '1px solid ' + (pass ? '#b6e0c6' : '#f1d99a');
+      result.innerHTML = (pass ? '✅ ' : '🔁 ') + 'You scored <b>' + correct + '/' + total + '</b> (' + pct + '%). ' +
+        (answered < total ? '(' + (total-answered) + ' left blank.) ' : '') +
+        (pass ? 'Nicely done — you meet the 80% bar. Review any reds above.' :
+                'Below the 80% bar — review the explanations above and the related modules, then retake.');
+      result.classList.add('show');
+      result.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  }
+  var qReset = document.getElementById('quiz-reset');
+  if(qReset){
+    qReset.addEventListener('click', function(){
+      document.querySelectorAll('#final-quiz .quiz-item').forEach(function(kc){
+        kc.querySelectorAll('.kc-opt').forEach(function(o){o.classList.remove('selected','correct','incorrect');});
+        var ex = kc.querySelector('.kc-explain'); if(ex) ex.classList.remove('show');
+      });
+      result.classList.remove('show');
+      document.getElementById('quiz').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
+
+  // ---- checklist persistence ----
+  document.querySelectorAll('input[type=checkbox][data-persist]').forEach(function(cb){
+    var key = 'i9train_' + cb.id;
+    try { if(localStorage.getItem(key) === '1') cb.checked = true; } catch(_){}
+    cb.addEventListener('change', function(){
+      try { localStorage.setItem(key, cb.checked ? '1' : '0'); } catch(_){}
+    });
+  });
+  var resetCk = document.getElementById('resetChecklist');
+  if(resetCk){
+    resetCk.addEventListener('click', function(){
+      document.querySelectorAll('input[type=checkbox][data-persist]').forEach(function(cb){
+        cb.checked = false;
+        try { localStorage.removeItem('i9train_' + cb.id); } catch(_){}
+      });
+    });
+  }
+
+  // ---- expand/collapse all <details> ----
+  var expandAll = document.getElementById('expandAll');
+  if(expandAll){
+    expandAll.addEventListener('click', function(){
+      var all = Array.prototype.slice.call(document.querySelectorAll('details'));
+      var anyClosed = all.some(function(d){return !d.open;});
+      all.forEach(function(d){ d.open = anyClosed; });
+      expandAll.textContent = anyClosed ? 'Collapse all' : 'Expand all';
+    });
+  }
+
+  // ---- print (open details first) ----
+  var printBtn = document.getElementById('printBtn');
+  if(printBtn) printBtn.addEventListener('click', function(){ window.print(); });
+  window.addEventListener('beforeprint', function(){
+    document.querySelectorAll('details').forEach(function(d){
+      d.setAttribute('data-wasopen', d.open ? '1' : '0'); d.open = true;
+    });
+  });
+  window.addEventListener('afterprint', function(){
+    document.querySelectorAll('details').forEach(function(d){
+      d.open = d.getAttribute('data-wasopen') === '1';
+    });
+  });
+
+  // ---- theme toggle ----
+  var themeBtn = document.getElementById('themeBtn');
+  try { if(localStorage.getItem('i9train_theme') === 'dark') document.body.classList.add('dark'); } catch(_){}
+  if(themeBtn){
+    themeBtn.addEventListener('click', function(){
+      document.body.classList.toggle('dark');
+      try { localStorage.setItem('i9train_theme', document.body.classList.contains('dark') ? 'dark' : 'light'); } catch(_){}
+    });
+  }
+
+  // ---- mobile TOC toggle ----
+  var menuToggle = document.getElementById('menuToggle');
+  var toc = document.getElementById('toc');
+  if(menuToggle && toc){
+    menuToggle.addEventListener('click', function(){ toc.classList.toggle('open'); });
+    toc.addEventListener('click', function(e){
+      if(e.target.tagName === 'A') toc.classList.remove('open');
+    });
+  }
+})();
+</script>
+</body>
+</html>
